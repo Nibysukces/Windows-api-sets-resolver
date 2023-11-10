@@ -105,6 +105,7 @@ fn get_api_set_redirect_by_hash(
     unsafe {
         let mut lower_bound = 0;
         let mut upper_bound = (*api_set_map).Count;
+
         while lower_bound < upper_bound {
             let mid_index = (lower_bound + upper_bound) / 2;
             let api_set_hash_entry = get_api_set_hash_entry(api_set_map, mid_index);
