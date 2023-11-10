@@ -153,7 +153,6 @@ fn main() {
 
     unsafe {
         let api_set_map = (*NtCurrentPeb()).ApiSetMap;
-        println!("api_set_map = 0x{:X}", api_set_map as usize);
 
         for desc in imports {
             let dll_name = desc.dll_name().unwrap().to_str().unwrap();
@@ -175,7 +174,12 @@ fn main() {
                 }
 
                 for import in desc.int().unwrap() {
-                    println!("\t{:?}", import)
+                    match import.unwrap() {
+                        pelite::pe64::imports::Import::ByName { hint: _, name } => {
+                            println!("\tImported func = {}", name)
+                        }
+                        pelite::pe64::imports::Import::ByOrdinal { ord: _ } => (),
+                    };
                 }
             }
         }
