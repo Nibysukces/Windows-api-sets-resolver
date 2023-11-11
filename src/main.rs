@@ -16,7 +16,11 @@ fn is_api_set_dll(name: &str) -> bool {
 }
 
 fn get_dll_name_without_extension(name: &str) -> String {
-    let last_hyphen_index = name.rfind('-').unwrap();
+    let last_hyphen_index = match name.rfind('-') {
+        Some(value) => value,
+        // SAFETY: Since before calling this function, we've checked if the dll is an api set dll which is guranteed to have at least one hyphen
+        None => unsafe { std::hint::unreachable_unchecked() },
+    };
 
     name[..last_hyphen_index].to_owned()
 }
@@ -56,7 +60,7 @@ fn get_api_set_namespace_entry(
     }
 }
 
-// returns the name used for calculating the hash key
+/// Returns the name used for calculating the hash key
 fn get_api_set_hash_name_of_entry(
     api_set_map: *const API_SET_NAMESPACE,
     entry: *const API_SET_NAMESPACE_ENTRY,
@@ -106,6 +110,7 @@ fn get_api_set_redirect_by_hash(
         let mut lower_bound = 0;
         let mut upper_bound = (*api_set_map).Count;
 
+        // searching for api set redirect, by performing binary search
         while lower_bound < upper_bound {
             let mid_index = (lower_bound + upper_bound) / 2;
             let api_set_hash_entry = get_api_set_hash_entry(api_set_map, mid_index);
